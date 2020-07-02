@@ -1,6 +1,9 @@
 # Kafka Fraud Detector - Updated with User Accounts
 
-Using this awesome project to expand and hopefully build a workable big data streaming example for learning Kafka, Spark, and MAchine Learning.
+Using this awesome project to expand and hopefully build a workable big data streaming example for learning Kafka, Spark, SuperSet, and Machine Learning.
+
+Integrating Faker generated data to create user accounts to withdraw and deposit random amounts dependent on a user classification of their spend type:
+** Spend Types: LOW, MEDIUM, HIGH
 
 [![Kafka](https://img.shields.io/badge/streaming_platform-kafka-black.svg?style=flat-square)](https://kafka.apache.org)
 [![Docker Images](https://img.shields.io/badge/docker_images-confluent-orange.svg?style=flat-square)](https://github.com/confluentinc/cp-docker-images)
