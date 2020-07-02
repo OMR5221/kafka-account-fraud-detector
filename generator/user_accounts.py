@@ -13,12 +13,12 @@ def _random_account_id() -> str:
     """Return a random account number made of 12 characters."""
     return ''.join(choices(account_chars, k=12))
 
-def _gen_user_accounts(num_accounts: int) -> dict:
+def _gen_user_accounts(num_accts: int) -> dict:
     fake = Faker()
     """Return a random user_profile."""
     sex_cd = ["M", "F"]
     accounts = []
-    for i in range(num_profiles):
+    for i in range(num_accts):
         user = {}
         user['account_number'] = _random_account_id()
         # Sex:
@@ -39,14 +39,14 @@ def _gen_user_accounts(num_accounts: int) -> dict:
         # Signup Date:
         current_date = date.today()
         start_date = current_date - timedelta(days=1825)
-        rand_day_num = random.randrange(1825)
+        rand_day_num = randrange(1825)
         user['signup_date'] = start_date + timedelta(days=rand_day_num)
         # Username:
-        user['username'] = f"{lower(profile['first_name'][0])}{lower(profile[last_name])}"
+        user['username'] = f"{(user['first_name'][0]).lower()}{(user['last_name']).lower()}"
         # Email:
-        user['email'] = "{profile['username']}@gmail.com"
+        user['email'] = f"{user['username']}@gmail.com"
         # Address:
-        user['address'] = fake.address()
+        user['address'] = str((fake.address()).replace("\n", ' ').replace(",", ""))
         # Job:
         user['job'] = fake.job()
         # Company:
@@ -61,6 +61,7 @@ def _gen_user_accounts(num_accounts: int) -> dict:
         spend_index = randint(0, 2)
         user['spend_type'] = spend_index
         
+        print(user)
         accounts.append(user)
 
     return accounts
@@ -71,28 +72,37 @@ def _write_to_db(profiles: dict):
     conn = connect(
             dbname="transactions_db",
             user="postgres",
-            host="db",
+            host="postgres",
             password="postgres"
             )
+    insert_user_sql = """
+        INSERT INTO user_accounts_dim (account_number, first_name, last_name, birth_date, sex, signup_date, username, email, address, spend_type) 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """
+    rec_cnt = 0
     cursor = conn.cursor()
     for user in profiles:
-        cursor.execute(f"INSERT INTO {table_name} VALUES (
-                DEFAULT,
-                {user['account_number']},
-                {user['first_name']},
-                {user['last_name']}, 
-                {user['birth_date']}, 
-                {user['sex']},
-                {user['signup_date']},
-                {user['user_id']},
-                {user['username']},
-                {user['email']},
-                {user['address']},
-                {user['spend_type']}
-        );")
+        cursor.execute(insert_user_sql, 
+            (
+            user['account_number'],
+            user['first_name'],
+            user['last_name'],
+            user['birth_date'],
+            user['sex'],
+            user['signup_date'],
+            user['username'],
+            user['email'],
+            user['address'],
+            user['spend_type']
+            )
+        )
 
+        rec_cnt += 1
+
+    conn.commit()
     cursor.close()
     conn.close()
+    print(f"Record Insert Count: {rec_cnt}")
     
 def create_user_accounts() -> dict:
     """Create a random, fake use profile"""

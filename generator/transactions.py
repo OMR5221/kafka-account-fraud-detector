@@ -1,36 +1,41 @@
 """Utilities to model money transactions."""
 
-from random import choices, choice, randint
+from random import choices, choice, randint, random
 from string import ascii_letters, digits
 from typing import List, Tuple
 import numpy as np
+from psycopg2 import connect
+
 
 account_chars: str = digits + ascii_letters
 
-
 def _random_customer(cust_dtls) -> tuple:
     """Return a random account number made of 12 characters."""
-    return random.choice(cust_dtls)
+    return choices(cust_dtls)[0]
 
 def _get_cust_dtls() -> List[Tuple[str, str]]:
     table_name = "user_accounts_dim"
     conn = connect(
             dbname="transactions_db",
             user="postgres",
-            host="db",
+            host="postgres",
             password="postgres"
             )
     cursor = conn.cursor()
     cust_dtls_sql = f'SELECT account_number, spend_type FROM {table_name}'
     cursor.execute(cust_dtls_sql)
     cust_dtls = cursor.fetchall()
+    print(f"Number of customer accts: {len(cust_dtls)}")
+    cursor.close()
+    conn.close()
     return cust_dtls
 
-def _random_amount(spend_type) -> float:
+def _random_amount(spend_type: int) -> float:
     # Get a bucket the user will choose to spend the amount from:
     bucket_probs = {0: [0.8, 0.1, 0.1], 1: [0.3, 0.5, 0.2], 2: [0.2, 0.4, 0.4]}
     bucket_num = np.random.choice(3, 1, p=bucket_probs[spend_type])
     
+    print(f"User Bucker Num: {bucket_num}")
     if bucket_num == 0:
         """Return a random amount between 1.00 and 100.00"""
         return randint(100, 1000) / 100
@@ -46,8 +51,12 @@ def create_random_transaction() -> dict:
     """Create a fake, randomised transaction."""
     cust_dtls = _get_cust_dtls()
     source_cust = _random_customer(cust_dtls)
-    rand_amt = _random_amount(rand_cust[1])
+    print(f"Source Customer: {source_cust}")
+    print(f"Source Customer Type: {type(source_cust)}")
+    rand_amt = _random_amount(source_cust[1])
+    print(f"Random Amt: {rand_amt}")
     target_cust = _random_customer(cust_dtls)
+    print(f"Target Customer: {target_cust}")
 
     return {
         'source': source_cust[0],

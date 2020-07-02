@@ -25,6 +25,10 @@ services:
       LEGIT_TOPIC: streaming.transactions.legit
       FRAUD_TOPIC: streaming.transactions.fraud
 
+
+volumes:
+  db-data:
+
 networks:
   default:
     external:

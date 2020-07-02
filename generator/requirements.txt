@@ -2,3 +2,4 @@ kafka-python
 boto3
 Faker
 psycopg2
+numpy
