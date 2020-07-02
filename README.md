@@ -1,4 +1,6 @@
-# Kafka Fraud Detector
+# Kafka Fraud Detector - Updated with User Accounts
+
+Using this awesome project to expand and hopefully build a workable big data streaming example for learning Kafka, Spark, and MAchine Learning.
 
 [![Kafka](https://img.shields.io/badge/streaming_platform-kafka-black.svg?style=flat-square)](https://kafka.apache.org)
 [![Docker Images](https://img.shields.io/badge/docker_images-confluent-orange.svg?style=flat-square)](https://github.com/confluentinc/cp-docker-images)
