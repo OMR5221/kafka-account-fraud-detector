@@ -5,7 +5,7 @@ from string import ascii_letters, digits
 from typing import List, Tuple
 import numpy as np
 from psycopg2 import connect
-
+from datetime import datetime
 
 account_chars: str = digits + ascii_letters
 
@@ -59,6 +59,8 @@ def create_random_transaction() -> dict:
     print(f"Target Customer: {target_cust}")
 
     return {
+        'activity_timestamp_utc': datetime.utcnow().timestamp(),
+        'event': 'transfer',
         'source': source_cust[0],
         'target': target_cust[0],
         'amount': rand_amt,

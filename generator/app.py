@@ -1,4 +1,4 @@
-"""Produce fake transactions into a Kafka topic."""
+"""Producer: Creates fake transactions into a Kafka topic."""
 
 import os
 from time import sleep
@@ -15,7 +15,9 @@ SLEEP_TIME = 1 / TRANSACTIONS_PER_SECOND
 
 
 if __name__ == '__main__':
+    # Create a set of random user accounts:
     create_user_accounts()
+
     producer = KafkaProducer(
         bootstrap_servers=KAFKA_BROKER_URL,
         # Encode all values as JSON
