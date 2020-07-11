@@ -32,8 +32,8 @@ def _get_cust_dtls() -> List[Tuple[str, str]]:
 
 def _random_amount(spend_type: int) -> float:
     # Get a bucket the user will choose to spend the amount from:
-    bucket_probs = {0: [0.8, 0.1, 0.1], 1: [0.3, 0.5, 0.2], 2: [0.2, 0.4, 0.4]}
-    bucket_num = np.random.choice(3, 1, p=bucket_probs[spend_type])
+    bucket_probs = {0: [0.75, 0.1, 0.05, 0.1], 1: [0.45, 0.35, 0.1, 0.1], 2: [0.2, 0.4, 0.35, 0.05]}
+    bucket_num = np.random.choice(4, 1, p=bucket_probs[spend_type])
     
     print(f"User Bucker Num: {bucket_num}")
     if bucket_num == 0:
@@ -45,6 +45,9 @@ def _random_amount(spend_type: int) -> float:
     elif bucket_num == 2:
         """Return a random amount between 1.00 and 1000.00"""
         return randint(100, 10000) / 100
+    elif bucket_num == 3:
+        """Return a random amount between 1000.00 and 5000"""
+        return randint(10000, 50000) / 100
 
 
 def create_random_transaction() -> dict:
@@ -64,5 +67,6 @@ def create_random_transaction() -> dict:
         'source': source_cust[0],
         'target': target_cust[0],
         'amount': rand_amt,
+        'spend_type': source_cust[1],
         'currency': 'USD',
     }

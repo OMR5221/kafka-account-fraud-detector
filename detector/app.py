@@ -16,10 +16,12 @@ FRAUD_TOPIC = os.environ.get('FRAUD_TOPIC')
 # Implement logic based on user spend_type:
 def is_suspicious(transaction: dict) -> bool:
     """Determine whether a transaction is suspicious."""
-    return transaction['amount'] >= 900
-    # spend_type == 0: (1,100)
-    # spend_type == 1: (1, 500)
-    # spend_type == 2: (1, 1000)
+    if transaction['spend_type'] == 0:
+        return transaction['amount'] > 100
+    elif transaction['spend_type'] == 1:
+        return transaction['amount'] > 500
+    elif transaction['spend_type'] == 2:
+        return transaction['amount'] > 1000
 
 def upload_file_to_s3(local_file, bucket, s3_file):
     s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
@@ -42,6 +44,7 @@ def upload_list_to_s3(bucket_nm, output_file_nm, output_data):
 
 
 if __name__ == '__main__':
+
     # Push messages to Transactions Topic
     producer = KafkaProducer(
         bootstrap_servers=KAFKA_BROKER_URL,
