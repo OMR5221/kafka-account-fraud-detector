@@ -1,5 +1,5 @@
-kafka-python
 Faker
 psycopg2
 numpy
 confluent-kafka[avro]==1.4.0
+boto3

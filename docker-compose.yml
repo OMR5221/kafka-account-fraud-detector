@@ -4,32 +4,41 @@ services:
 
   postgres:
     image: postgres:9.4
+    container_name: postgres
+    ports:
+      - "5432:5432"
     env_file: 
-      - ./generator/db/db.env
+      - ./producer/db/db.env
     volumes:
-      - ./generator/db/sql:/docker-entrypoint-initdb.d/ # Add SQL to run
+      - ./producer/db/sql:/docker-entrypoint-initdb.d/ # Add SQL to run
       - db-data:/var/lib/postgresql/data/ # persist even on shutdown
 
-  generator:
-    build: ./generator
+  producer:
+    build: ./producer
+    container_name: producer
+    network_mode: "host"
+    depends_on:
+      - postgres
     environment:
-      KAFKA_BROKER_URL: broker:9092
-      TRANSACTIONS_TOPIC: queueing.transactions
+      KAFKA_BROKER_URL: 'localhost:9092'
+      SCHEMA_REGISTRY_URL:  'http://localhost:8081'
+      TRANSACTIONS_TOPIC: 'queueing.transactions'
       TRANSACTIONS_PER_SECOND: 1000
 
-  detector:
-    build: ./detector
+  consumer:
+    build: ./consumer
     env_file: aws.env
+    container_name: consumer
+    network_mode: "host"
+    depends_on:
+      - postgres
+      - producer
     environment:
-      KAFKA_BROKER_URL: broker:9092
-      TRANSACTIONS_TOPIC: queueing.transactions
-      LEGIT_TOPIC: streaming.transactions.legit
-      FRAUD_TOPIC: streaming.transactions.fraud
+      KAFKA_BROKER_URL: 'localhost:9092'
+      SCHEMA_REGISTRY_URL: 'http://localhost:8081'
+      TRANSACTIONS_TOPIC: 'queueing.transactions'
+      LEGIT_TOPIC: 'streaming.transactions.legit'
+      FRAUD_TOPIC: 'streaming.transactions.fraud'
 
 volumes:
   db-data:
-
-networks:
-  default:
-    external:
-      name: analytics-network

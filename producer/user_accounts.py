@@ -72,7 +72,7 @@ def _write_to_db(profiles: dict):
     conn = connect(
             dbname="transactions_db",
             user="postgres",
-            host="postgres",
+            host="localhost",
             password="postgres"
             )
     insert_user_sql = """

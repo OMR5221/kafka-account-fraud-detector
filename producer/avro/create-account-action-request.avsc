@@ -1,0 +1,31 @@
+{
+  "namespace": "omr.test.createaccountactionrequest",
+  "type": "record",
+  "name": "CreateAccountActionRequest",
+  "fields": [
+    {
+      "name": "eventName",
+      "type": "string"
+    },
+    {
+      "name": "sourceAcct",
+      "type": "string"
+    },
+    {
+      "name": "targetAcct",
+      "type": "string"
+    },
+    {
+      "name": "amount",
+      "type": "float"
+    },
+    {
+      "name": "customerSpendType",
+      "type": "int"
+    },
+    {
+      "name": "currency",
+      "type": "string"
+    }
+  ]
+}

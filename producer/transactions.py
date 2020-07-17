@@ -13,12 +13,19 @@ def _random_customer(cust_dtls) -> tuple:
     """Return a random account number made of 12 characters."""
     return choices(cust_dtls)[0]
 
+def _random_event() -> str:
+    """Return a random event the customer is taking: 0: Withdraw , 1: Deposit, 2: Transfer"""
+    event_probs = [0.5, 0.3, 0.2]
+    event_id = np.random.choice(3, 1, p=event_probs)
+    events = {0: 'withdrawal', 1: 'deposit', 2: 'transfer'}
+    return events[int(event_id)]
+
 def _get_cust_dtls() -> List[Tuple[str, str]]:
     table_name = "user_accounts_dim"
     conn = connect(
             dbname="transactions_db",
             user="postgres",
-            host="postgres",
+            host="localhost",
             password="postgres"
             )
     cursor = conn.cursor()
@@ -38,16 +45,16 @@ def _random_amount(spend_type: int) -> float:
     print(f"User Bucker Num: {bucket_num}")
     if bucket_num == 0:
         """Return a random amount between 1.00 and 100.00"""
-        return randint(100, 1000) / 100
+        return float(int(randint(100, 1000)) / 100)
     elif bucket_num == 1:
         """Return a random amount between 1.00 and 500.00"""
-        return randint(100, 5000) / 100
+        return float(int(randint(100, 5000)) / 100)
     elif bucket_num == 2:
         """Return a random amount between 1.00 and 1000.00"""
-        return randint(100, 10000) / 100
+        return float(int(randint(100, 10000)) / 100)
     elif bucket_num == 3:
         """Return a random amount between 1000.00 and 5000"""
-        return randint(10000, 50000) / 100
+        return float(int(randint(10000, 50000)) / 100)
 
 
 def create_random_transaction() -> dict:
@@ -56,17 +63,19 @@ def create_random_transaction() -> dict:
     source_cust = _random_customer(cust_dtls)
     print(f"Source Customer: {source_cust}")
     print(f"Source Customer Type: {type(source_cust)}")
-    rand_amt = _random_amount(source_cust[1])
-    print(f"Random Amt: {rand_amt}")
+    rand_amt = _random_amount(int(source_cust[1]))
+    print(f"Random Amt: {type(rand_amt)}")
     target_cust = _random_customer(cust_dtls)
     print(f"Target Customer: {target_cust}")
+    rand_event = _random_event()
+    print(f"Event: {str(rand_event)}")
 
     return {
-        'activity_timestamp_utc': datetime.utcnow().timestamp(),
-        'event': 'transfer',
-        'source': source_cust[0],
-        'target': target_cust[0],
+        # 'activityTimestampUTC': datetime.utcnow().timestamp(),
+        'eventName': rand_event,
+        'sourceAcct': source_cust[0],
+        'targetAcct': target_cust[0],
         'amount': rand_amt,
-        'spend_type': source_cust[1],
-        'currency': 'USD',
+        'customerSpendType': int(source_cust[1]),
+        'currency': 'USD'
     }
