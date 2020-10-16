@@ -23,7 +23,7 @@ services:
       KAFKA_BROKER_URL: 'localhost:9092'
       SCHEMA_REGISTRY_URL:  'http://localhost:8081'
       TRANSACTIONS_TOPIC: 'queueing.transactions'
-      TRANSACTIONS_PER_SECOND: 1000
+      TRANSACTIONS_PER_SECOND: 5
 
   consumer:
     build: ./consumer

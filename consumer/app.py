@@ -4,7 +4,7 @@ import json
 import os
 
 # from kafka import KafkaConsumer, KafkaProducer
-from confluent_kafka.avro import AvroConsumer
+from confluent_kafka.avro import AvroConsumer, AvroProducer
 import boto3
 from botocore.exceptions import NoCredentialsError
 from datetime import datetime
@@ -19,7 +19,7 @@ FRAUD_TOPIC = os.environ.get('FRAUD_TOPIC')
 # Implement logic based on user spend_type:
 def is_suspicious(transaction: dict) -> bool:
     """Determine whether a transaction is suspicious."""
-    if transaction['cusotmerSpendType'] == 0:
+    if transaction['customerSpendType'] == 0:
         return transaction['amount'] > 100
     elif transaction['customerSpendType'] == 1:
         return transaction['amount'] > 500
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     default_group_name = "default-consumer-group"
 
     # Push messages to Transactions Topic
-    # producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL, value_serializer=lambda value: json.dumps(value).encode())
+    # producer = AvroProducer(bootstrap_servers=KAFKA_BROKER_URL, value_serializer=lambda value: json.dumps(value).encode())
 
     consumer_config = {
         "bootstrap.servers": KAFKA_BROKER_URL,
@@ -112,16 +112,21 @@ if __name__ == '__main__':
             print(f"Successfully polled records from KAFKA TOPIC: {TRANSACTIONS_TOPIC}")
             print(f"Message Value: {message.value()}")
             consumer.commit()
-            # raw_messages.append(message.value())
-            # transaction: dict = message.value()
-            # topic = FRAUD_TOPIC if is_suspicious(transaction) else LEGIT_TOPIC
+            raw_messages.append(message.value())
+
+            print(f"Raw Messages Length: {len(raw_messages)}")
+
+            transaction: dict = message.value()
+            topic = FRAUD_TOPIC if is_suspicious(transaction) else LEGIT_TOPIC
             # producer.send(topic, value=transaction)
-            # print(topic, transaction)  # DEBUG
+            
+            print(topic, transaction)  # DEBUG
+            
             # Load to S3 Bucket:
-            # if len(raw_messages) > 0 and len(raw_messages) % 1000 == 0:
-                # utc_timestamp = datetime.utcnow().timestamp()
-                # upload_list_to_s3('kafka-fraud-detector', f'transactions_{utc_timestamp}.json', raw_messages)
-                # raw_messages = []
+            if len(raw_messages) > 0 and len(raw_messages) % 1000 == 0:
+                utc_timestamp = datetime.utcnow().timestamp()
+                upload_list_to_s3('kafka-fraud-detector', f'transactions_{utc_timestamp}.json', raw_messages)
+                raw_messages = []
         elif message is None:
             print("No new messages found at this time.")
             continue
@@ -130,4 +135,5 @@ if __name__ == '__main__':
             continue
 
         print(message.value())
+
     consumer.close()

@@ -1,4 +1,6 @@
-"""Producer: Creates fake transactions into a Kafka topic."""
+"""
+    Producer: Creates fake transactions into a Kafka topic.
+"""
 # Core:
 import os
 from time import sleep
